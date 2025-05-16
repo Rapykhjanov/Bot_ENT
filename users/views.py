@@ -1,8 +1,8 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from .serializers import UserSerializer
 from django.contrib.auth.models import User as DjangoUser
+from .serializers import UserSerializer
 
 class UserRegistrationView(generics.CreateAPIView):
     queryset = DjangoUser.objects.all()
@@ -10,12 +10,11 @@ class UserRegistrationView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
 
     def perform_create(self, serializer):
-        user = DjangoUser.objects.create_user(**serializer.validated_data)
-        # Здесь можно добавить дополнительную логику после регистрации, например, отправку email
-        return Response(serializer.data, status=201)
+        # Создаём пользователя через create_user
+        DjangoUser.objects.create_user(**serializer.validated_data)
 
 class UserLoginView(generics.GenericAPIView):
-    serializer_class = UserSerializer # Можно создать отдельный сериализатор для логина
+    serializer_class = UserSerializer  # Лучше создать отдельный LoginSerializer
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
@@ -23,7 +22,6 @@ class UserLoginView(generics.GenericAPIView):
         password = request.data.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            # Здесь нужно реализовать логику аутентификации, например, создание токена
             return Response({'message': 'Успешная авторизация'}, status=200)
         else:
             return Response({'error': 'Неверные учетные данные'}, status=400)

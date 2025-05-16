@@ -1,3 +1,5 @@
+# tasks/serializers.py
+
 from rest_framework import serializers
 from .models import (
     Question, Answer, Hint, TestResult,
@@ -5,65 +7,57 @@ from .models import (
     Theory, TrainingSession
 )
 
-# Сериализатор для темы (Topic)
+# Сериализатор для темы
 class TopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
         fields = '__all__'
 
-
-# Сериализатор для уровня (Level)
+# Сериализатор для уровня
 class LevelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Level
         fields = '__all__'
 
-
-# Сериализатор для вопроса (Question)
+# ✅ Исправленный сериализатор для вопроса
 class QuestionSerializer(serializers.ModelSerializer):
-    topic = TopicSerializer(read_only=True)  # Вложенный сериализатор для темы
-    level = LevelSerializer(read_only=True)  # Вложенный сериализатор для уровня
+    topic = serializers.PrimaryKeyRelatedField(queryset=Topic.objects.all())
+    level = serializers.PrimaryKeyRelatedField(queryset=Level.objects.all(), allow_null=True, required=False)
 
     class Meta:
         model = Question
         fields = '__all__'
 
-
-# Сериализатор для ответа (Answer)
+# Сериализатор для ответа
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = '__all__'
 
-
-# Сериализатор для подсказки (Hint)
+# Сериализатор для подсказки
 class HintSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hint
         fields = '__all__'
 
-
-# Сериализатор для результата теста (TestResult)
+# Сериализатор для результата теста
 class TestResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestResult
         fields = '__all__'
 
-
-# Сериализатор для отправки ответа на вопрос (AnswerSubmitSerializer)
+# Сериализатор для отправки ответа на вопрос
 class AnswerSubmitSerializer(serializers.Serializer):
-    question_id = serializers.IntegerField()  # ID вопроса
-    answer_text = serializers.CharField(max_length=255)  # Текст ответа
+    question_id = serializers.IntegerField()
+    answer_text = serializers.CharField(max_length=255)
 
-
-# Сериализатор для теории (Theory)
+# Сериализатор для теории
 class TheorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Theory
         fields = '__all__'
 
-
-# Сериализатор для тренировочной сессии (TrainingSession)
+# Сериализатор для тренировочной сессии
 class TrainingSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrainingSession
